@@ -7,14 +7,25 @@ export const proxy = async (req: NextRequest) => {
 
   let isAuthenticated = false;
   let isAdmin = false;
+  let isTutor = false;
+  let isStudent = false;
 
   const { data } = await userService.getSession();
   if (data) {
     isAuthenticated = true;
     if (data.user.role === RolesEnum.ADMIN) {
       isAdmin = true;
+    } else if (data.user.role === RolesEnum.TUTOR) {
+      isTutor = true;
+    } else if (data.user.role === RolesEnum.STUDENT) {
+      isStudent = true;
     }
   }
+
+  // console.log("isAuthenticated", isAuthenticated);
+  // console.log("isAdmin:", isAdmin);
+  // console.log("isTutor", isTutor);
+  // console.log("isStudent", isStudent);
 
   if (!isAuthenticated) {
     return NextResponse.redirect(new URL("/login", req.url));
@@ -24,9 +35,17 @@ export const proxy = async (req: NextRequest) => {
     return NextResponse.redirect(new URL("/admin-dashboard", req.url));
   }
 
-  if (!isAdmin && pathName.startsWith("/admin-dashboard")) {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+  if (isTutor) {
+    return NextResponse.redirect(new URL("/tutor-dashboard", req.url));
   }
+
+  if (isStudent && pathName.startsWith("/admin-dashboard")) {
+    return NextResponse.redirect(new URL("/student-dashboard", req.url));
+  }
+
+  // if (!isAdmin && pathName.startsWith("/admin-dashboard")) {
+  //   return NextResponse.redirect(new URL("/dashboard", req.url));
+  // }
 
   return NextResponse.next();
 };
