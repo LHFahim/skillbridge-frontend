@@ -1,8 +1,15 @@
-export default function TutorDashboardPage() {
+import { TutorForm } from "@/components/modules/tutor/tutor-form";
+import { categoryService } from "@/services/category.service";
+
+export default async function TutorDashboardPage() {
+  const response = await categoryService.getAllCategories();
+  const categories = response?.data?.data ?? [];
+
   return (
     <div>
-      <h1>Create your tutor profile</h1>
-      <p>Welcome to the tutor dashboard page.</p>
+      <div>
+        <TutorForm categories={categories} />
+      </div>
     </div>
   );
 }
