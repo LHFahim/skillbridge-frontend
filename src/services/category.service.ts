@@ -36,4 +36,53 @@ export const categoryService = {
       return { data: null, error: { message: "Something Went Wrong" } };
     }
   },
+
+  getAllCategories: async () => {
+    try {
+      const cookieStore = await cookies();
+      const res = await fetch(`${API_URL}/categories`, {
+        method: "GET",
+        headers: {
+          Cookie: cookieStore.toString(),
+        },
+        cache: "no-store",
+      });
+      const data = await res.json();
+
+      if (data.error) {
+        return {
+          data: null,
+          error: { message: "Error: Could not fetch categories." },
+        };
+      }
+      return { data: data, error: null };
+    } catch (err) {
+      return { data: null, error: { message: "Something Went Wrong" } };
+    }
+  },
+
+  deleteCategory: async (categoryId: string) => {
+    try {
+      const cookieStore = await cookies();
+      const res = await fetch(`${API_URL}/categories/${categoryId}`, {
+        method: "DELETE",
+        headers: {
+          Cookie: cookieStore.toString(),
+        },
+      });
+
+      const data = await res.json();
+      console.log("🚀 ~ data:", data);
+
+      if (data.error) {
+        return {
+          data: null,
+          error: { message: "Error: Could not delete category." },
+        };
+      }
+      return { data: data, error: null };
+    } catch (err) {
+      return { data: null, error: { message: "Something Went Wrong" } };
+    }
+  },
 };

@@ -11,3 +11,11 @@ export const createCategory = async (payload: ICreateCategory) => {
 
   return res;
 };
+
+export const deleteCategory = async (categoryId: string) => {
+  const res = await categoryService.deleteCategory(categoryId);
+
+  updateTag("categories");
+
+  return res;
+};
