@@ -2,6 +2,7 @@ import { env } from "@/env";
 import { cookies } from "next/headers";
 
 const AUTH_URL = env.AUTH_URL;
+const API_URL = env.API_URL;
 
 export const userService = {
   getSession: async () => {
@@ -33,6 +34,62 @@ export const userService = {
         data: null,
         error: { message: "Failed to fetch session" },
       };
+    }
+  },
+
+  getAllUsers: async () => {
+    try {
+      const cookieStore = await cookies();
+
+      const res = await fetch(`${API_URL}/users`, {
+        method: "GET",
+        headers: {
+          cookie: cookieStore.toString(),
+        },
+        cache: "no-store",
+        next: { tags: ["users"] },
+      });
+
+      const data = await res.json();
+
+      if (data.error) {
+        return {
+          data: null,
+          error: { message: "Error: Could not fetch users." },
+        };
+      }
+
+      return { data: data, error: null };
+    } catch (err) {
+      return { data: null, error: { message: "Something Went Wrong" } };
+    }
+  },
+
+  deleteUser: async (userId: string) => {
+    try {
+      const cookieStore = await cookies();
+
+      const res = await fetch(`${API_URL}/users/${userId}/status`, {
+        method: "PATCH",
+        headers: {
+          cookie: cookieStore.toString(),
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: "BANNED" }),
+      });
+
+      const data = await res.json();
+
+      if (data.error) {
+        return {
+          data: null,
+          error: { message: "Error: Could not ban user." },
+        };
+      }
+
+      return { data: data, error: null };
+    } catch (err) {
+      return { data: null, error: { message: "Something Went Wrong" } };
     }
   },
 };
