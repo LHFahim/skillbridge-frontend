@@ -60,4 +60,30 @@ export const availabilityService = {
       return { data: null, error: { message: "Something Went Wrong" } };
     }
   },
+
+  deleteAvailabilitySlot: async (slotId: string) => {
+    try {
+      const cookieStore = await cookies();
+
+      const res = await fetch(`${API_URL}/availability/${slotId}`, {
+        method: "DELETE",
+        headers: {
+          Cookie: cookieStore.toString(),
+        },
+      });
+
+      const data = await res.json();
+
+      if (data.error) {
+        return {
+          data: null,
+          error: { message: "Error: Could not delete availability slot." },
+        };
+      }
+
+      return { data: data, error: null };
+    } catch (err) {
+      return { data: null, error: { message: "Something Went Wrong" } };
+    }
+  },
 };

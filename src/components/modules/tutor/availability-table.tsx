@@ -1,5 +1,7 @@
 "use client";
 
+import { deleteAvailabilitySlot } from "@/actions/availability.action";
+
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -35,6 +37,14 @@ export function AvailabilityTable({
     setIsDeleting(slotId);
 
     try {
+      const res = await deleteAvailabilitySlot(slotId);
+
+      if (res.error) {
+        toast.error(res.error.message, { id: toastId });
+        setIsDeleting(null);
+        return;
+      }
+
       toast.success("Availability slot deleted successfully", { id: toastId });
     } catch (err) {
       toast.error("Something went wrong", { id: toastId });
