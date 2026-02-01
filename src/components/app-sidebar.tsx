@@ -1,0 +1,68 @@
+import * as React from "react";
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+} from "@/components/ui/sidebar";
+import { RolesEnum } from "@/constants/role";
+import { adminRoutes } from "@/routes/adminRoutes";
+import { studentRoutes } from "@/routes/studentRoutes";
+import { tutorRoutes } from "@/routes/tutorRoutes";
+import { IRoute } from "@/types";
+import Link from "next/link";
+
+export function AppSidebar({
+  user,
+  ...props
+}: { user: { role: string } } & React.ComponentProps<typeof Sidebar>) {
+  let routes: IRoute[] = [];
+
+  switch (user.role) {
+    case RolesEnum.ADMIN:
+      routes = adminRoutes;
+      break;
+
+    case RolesEnum.STUDENT:
+      routes = studentRoutes;
+      break;
+
+    case RolesEnum.TUTOR:
+      routes = tutorRoutes;
+      break;
+
+    default:
+      routes = [];
+      break;
+  }
+
+  return (
+    <Sidebar {...props}>
+      <SidebarContent>
+        {routes.map((item) => (
+          <SidebarGroup key={item.title}>
+            <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {item.items.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <Link href={item.url}>{item.title}</Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
+      </SidebarContent>
+      <SidebarRail />
+    </Sidebar>
+  );
+}
