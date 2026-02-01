@@ -1,5 +1,35 @@
 import { env } from "@/env";
+import { ICreateAvailabilitySlot } from "@/types/availability.interface";
+import { cookies } from "next/headers";
 
 const API_URL = env.API_URL;
 
-export const availabilityService = {};
+export const availabilityService = {
+  createAvailabilitySlot: async (slot: ICreateAvailabilitySlot) => {
+    try {
+      const cookieStore = await cookies();
+
+      const res = await fetch(`${API_URL}/availability`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: cookieStore.toString(),
+        },
+        body: JSON.stringify(slot),
+      });
+
+      const data = await res.json();
+
+      if (data.error) {
+        return {
+          data: null,
+          error: { message: "Error: Could not create availability slot." },
+        };
+      }
+
+      return { data: data, error: null };
+    } catch (err) {
+      return { data: null, error: { message: "Something Went Wrong" } };
+    }
+  },
+};

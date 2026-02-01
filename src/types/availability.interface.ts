@@ -20,7 +20,7 @@ export enum AvailabilityStatusEnum {
   BOOKED = "BOOKED",
 }
 
-export interface IAvailabilitySlotCreate {
-  startAt: Date;
-  endAt: Date;
+export interface ICreateAvailabilitySlot {
+  startAt: string;
+  endAt: string;
 }
