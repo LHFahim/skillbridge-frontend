@@ -22,11 +22,6 @@ export const proxy = async (req: NextRequest) => {
     }
   }
 
-  // console.log("isAuthenticated", isAuthenticated);
-  // console.log("isAdmin:", isAdmin);
-  // console.log("isTutor", isTutor);
-  // console.log("isStudent", isStudent);
-
   if (!isAuthenticated) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
@@ -40,6 +35,10 @@ export const proxy = async (req: NextRequest) => {
   }
 
   if (isStudent && pathName.startsWith("/admin-dashboard")) {
+    return NextResponse.redirect(new URL("/student-dashboard", req.url));
+  }
+
+  if (isStudent) {
     return NextResponse.redirect(new URL("/student-dashboard", req.url));
   }
 
