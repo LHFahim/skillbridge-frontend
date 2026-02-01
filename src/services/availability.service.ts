@@ -32,4 +32,32 @@ export const availabilityService = {
       return { data: null, error: { message: "Something Went Wrong" } };
     }
   },
+
+  getAvailabilitySlots: async () => {
+    try {
+      const cookieStore = await cookies();
+
+      const res = await fetch(`${API_URL}/availability`, {
+        method: "GET",
+        headers: {
+          Cookie: cookieStore.toString(),
+        },
+        cache: "no-store",
+        next: { tags: ["availability"] },
+      });
+
+      const data = await res.json();
+
+      if (data.error) {
+        return {
+          data: null,
+          error: { message: "Error: Could not fetch availability slots." },
+        };
+      }
+
+      return { data: data, error: null };
+    } catch (err) {
+      return { data: null, error: { message: "Something Went Wrong" } };
+    }
+  },
 };
