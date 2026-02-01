@@ -16,6 +16,13 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { authClient } from "@/lib/auth-client";
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
@@ -25,6 +32,7 @@ const formSchema = z.object({
   name: z.string().min(1, "This field is required"),
   password: z.string().min(8, "Minimum length is 8"),
   email: z.email(),
+  role: z.enum(["STUDENT", "TUTOR"]),
 });
 
 export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
@@ -40,12 +48,14 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
       name: "",
       email: "",
       password: "",
+      role: "",
     },
     validators: {
       onSubmit: formSchema,
     },
     onSubmit: async ({ value }) => {
       const toastId = toast.loading("Creating user");
+
       try {
         const { data, error } = await authClient.signUp.email(value);
 
@@ -144,6 +154,43 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
                 );
               }}
             />
+
+            {/* role selection here */}
+            <form.Field
+              name="role"
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field orientation="responsive" data-invalid={isInvalid}>
+                    <FieldLabel htmlFor="form-tanstack-select-language">
+                      I am a
+                    </FieldLabel>
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+
+                    <Select
+                      name={field.name}
+                      value={field.state.value}
+                      onValueChange={field.handleChange}
+                    >
+                      <SelectTrigger
+                        id="form-tanstack-select-language"
+                        aria-invalid={isInvalid}
+                        className="min-w-[120px]"
+                      >
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent position="item-aligned">
+                        <SelectItem value="STUDENT">Student</SelectItem>
+                        <SelectItem value="TUTOR">Tutor</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                );
+              }}
+            />
           </FieldGroup>
         </form>
       </CardContent>
@@ -151,14 +198,14 @@ export function RegisterForm({ ...props }: React.ComponentProps<typeof Card>) {
         <Button form="login-form" type="submit" className="w-full">
           Register
         </Button>
-        <Button
+        {/* <Button
           onClick={() => handleGoogleLogin()}
           variant="outline"
           type="button"
           className="w-full"
         >
           Continue with Google
-        </Button>
+        </Button> */}
       </CardFooter>
     </Card>
   );
