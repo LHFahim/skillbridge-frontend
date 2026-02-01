@@ -16,8 +16,10 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { RolesEnum } from "@/constants/role";
 import { authClient } from "@/lib/auth-client";
 import { useForm } from "@tanstack/react-form";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import * as z from "zod";
 
@@ -27,6 +29,8 @@ const formSchema = z.object({
 });
 
 export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
+  const router = useRouter();
+
   const handleGoogleLogin = async () => {
     const data = authClient.signIn.social({
       provider: "google",
@@ -53,6 +57,18 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
         }
 
         toast.success("User Logged in Successfully", { id: toastId });
+
+        const userRole = (data?.user as any)?.role || RolesEnum.STUDENT;
+
+        if (userRole === RolesEnum.ADMIN) {
+          router.push("/admin-dashboard");
+        } else if (userRole === RolesEnum.TUTOR) {
+          router.push("/tutor-dashboard");
+        } else if (userRole === RolesEnum.STUDENT) {
+          router.push("/student-dashboard");
+        } else {
+          router.push("/dashboard");
+        }
       } catch (err) {
         toast.error("Something went wrong, please try again.", { id: toastId });
       }
@@ -62,9 +78,9 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
   return (
     <Card {...props}>
       <CardHeader>
-        <CardTitle>Create an account</CardTitle>
+        <CardTitle>Log into your account</CardTitle>
         <CardDescription>
-          Enter your information below to create your account
+          Enter your information below to log into your account
         </CardDescription>
       </CardHeader>
       <CardContent>
