@@ -1,5 +1,6 @@
 "use client";
 
+import { createReview } from "@/actions/review.action";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -27,7 +28,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { formatDateTime } from "@/lib/utils";
 import { BookingStatusEnum, IBooking } from "@/types/booking.interface";
 import { MoreHorizontalIcon } from "lucide-react";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
+import { toast } from "sonner";
 
 export function BookingTable({ bookings }: { bookings: IBooking[] }) {
   const [reviewingBooking, setReviewingBooking] = useState<IBooking | null>(
@@ -35,6 +37,7 @@ export function BookingTable({ bookings }: { bookings: IBooking[] }) {
   );
   const [reviewRating, setReviewRating] = useState<number | null>(null);
   const [reviewComment, setReviewComment] = useState("");
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const getStatusBadge = (status: BookingStatusEnum) => {
     const badgeClass =
       status === BookingStatusEnum.CONFIRMED
@@ -48,6 +51,39 @@ export function BookingTable({ bookings }: { bookings: IBooking[] }) {
         {status}
       </span>
     );
+  };
+
+  const handleSubmitReview = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!reviewingBooking || reviewRating === null) {
+      return;
+    }
+
+    const toastId = toast.loading("Submitting review...");
+    setIsSubmittingReview(true);
+
+    try {
+      const res = await createReview({
+        bookingId: reviewingBooking.id,
+        rating: reviewRating,
+        comment: reviewComment.trim() || undefined,
+      });
+
+      if (res.error) {
+        toast.error(res.error.message, { id: toastId });
+        return;
+      }
+
+      toast.success("Review submitted successfully", { id: toastId });
+      setReviewingBooking(null);
+      setReviewRating(null);
+      setReviewComment("");
+    } catch (err) {
+      toast.error("Something went wrong", { id: toastId });
+    } finally {
+      setIsSubmittingReview(false);
+    }
   };
 
   return (
@@ -141,8 +177,9 @@ export function BookingTable({ bookings }: { bookings: IBooking[] }) {
             </SheetDescription>
           </SheetHeader>
           <form
+            id="review-form"
             className="flex flex-col gap-5 p-4"
-            onSubmit={(event) => event.preventDefault()}
+            onSubmit={handleSubmitReview}
           >
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium">Rating</label>
@@ -178,11 +215,16 @@ export function BookingTable({ bookings }: { bookings: IBooking[] }) {
               type="button"
               variant="outline"
               onClick={() => setReviewingBooking(null)}
+              disabled={isSubmittingReview}
             >
               Close
             </Button>
-            <Button type="button" disabled={reviewRating === null}>
-              Submit Review
+            <Button
+              type="submit"
+              form="review-form"
+              disabled={reviewRating === null || isSubmittingReview}
+            >
+              {isSubmittingReview ? "Submitting..." : "Submit Review"}
             </Button>
           </SheetFooter>
         </SheetContent>
