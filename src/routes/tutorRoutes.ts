@@ -9,7 +9,7 @@ export const tutorRoutes: IRoute[] = [
         url: "/",
       },
       {
-        title: "Create a Tutor",
+        title: "Create Your Tutor Profile",
         url: "/tutor-dashboard/create-tutor-profile",
       },
       { title: "Availability", url: "/tutor-dashboard/availability" },
