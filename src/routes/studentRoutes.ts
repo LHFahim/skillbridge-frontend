@@ -5,6 +5,10 @@ export const studentRoutes: IRoute[] = [
     title: "Student Management",
     items: [
       {
+        title: "Home",
+        url: "/",
+      },
+      {
         title: "Dashboard",
         url: "/dashboard/student-dashboard",
       },

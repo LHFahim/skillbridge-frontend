@@ -5,6 +5,10 @@ export const tutorRoutes: IRoute[] = [
     title: "Tutor Management",
     items: [
       {
+        title: "Home",
+        url: "/",
+      },
+      {
         title: "Create a Tutor",
         url: "/tutor-dashboard/create-tutor-profile",
       },
