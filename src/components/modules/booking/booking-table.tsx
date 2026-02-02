@@ -1,5 +1,6 @@
 "use client";
 
+import { cancelBooking } from "@/actions/booking.action";
 import { createReview } from "@/actions/review.action";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,6 +39,11 @@ export function BookingTable({ bookings }: { bookings: IBooking[] }) {
   const [reviewRating, setReviewRating] = useState<number | null>(null);
   const [reviewComment, setReviewComment] = useState("");
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [cancelingBooking, setCancelingBooking] = useState<IBooking | null>(
+    null,
+  );
+  const [cancelReason, setCancelReason] = useState("");
+  const [isSubmittingCancel, setIsSubmittingCancel] = useState(false);
   const getStatusBadge = (status: BookingStatusEnum) => {
     const badgeClass =
       status === BookingStatusEnum.CONFIRMED
@@ -83,6 +89,37 @@ export function BookingTable({ bookings }: { bookings: IBooking[] }) {
       toast.error("Something went wrong", { id: toastId });
     } finally {
       setIsSubmittingReview(false);
+    }
+  };
+
+  const handleSubmitCancel = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!cancelingBooking) {
+      return;
+    }
+
+    const toastId = toast.loading("Canceling booking...");
+    setIsSubmittingCancel(true);
+
+    try {
+      const res = await cancelBooking(
+        cancelingBooking.id,
+        cancelReason.trim() || undefined,
+      );
+
+      if (res.error) {
+        toast.error(res.error.message, { id: toastId });
+        return;
+      }
+
+      toast.success("Booking cancelled successfully", { id: toastId });
+      setCancelingBooking(null);
+      setCancelReason("");
+    } catch (err) {
+      toast.error("Something went wrong", { id: toastId });
+    } finally {
+      setIsSubmittingCancel(false);
     }
   };
 
@@ -151,7 +188,14 @@ export function BookingTable({ bookings }: { bookings: IBooking[] }) {
                         >
                           Review
                         </DropdownMenuItem>
-                        <DropdownMenuItem disabled>Cancel</DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setCancelingBooking(booking);
+                            setCancelReason("");
+                          }}
+                        >
+                          Cancel
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -225,6 +269,55 @@ export function BookingTable({ bookings }: { bookings: IBooking[] }) {
               disabled={reviewRating === null || isSubmittingReview}
             >
               {isSubmittingReview ? "Submitting..." : "Submit Review"}
+            </Button>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+      <Sheet
+        open={!!cancelingBooking}
+        onOpenChange={(open) => {
+          if (!open) {
+            setCancelingBooking(null);
+          }
+        }}
+      >
+        <SheetContent side="right">
+          <SheetHeader>
+            <SheetTitle>Cancel Booking</SheetTitle>
+            <SheetDescription>
+              Are you sure you want to cancel this booking?
+            </SheetDescription>
+          </SheetHeader>
+          <form
+            id="cancel-form"
+            className="flex flex-col gap-5 p-4"
+            onSubmit={handleSubmitCancel}
+          >
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">Reason</label>
+              <Textarea
+                placeholder="Tell us why you're canceling this booking"
+                value={cancelReason}
+                onChange={(event) => setCancelReason(event.target.value)}
+              />
+            </div>
+          </form>
+          <SheetFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setCancelingBooking(null)}
+              disabled={isSubmittingCancel}
+            >
+              Keep Booking
+            </Button>
+            <Button
+              type="submit"
+              form="cancel-form"
+              variant="destructive"
+              disabled={isSubmittingCancel}
+            >
+              {isSubmittingCancel ? "Canceling..." : "Cancel Booking"}
             </Button>
           </SheetFooter>
         </SheetContent>

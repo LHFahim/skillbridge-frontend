@@ -12,3 +12,11 @@ export const createBooking = async (payload: ICreateBooking) => {
 
   return res;
 };
+
+export const cancelBooking = async (bookingId: string, reason?: string) => {
+  const res = await bookingService.cancelBooking(bookingId, reason);
+
+  revalidateTag("bookings", "default");
+
+  return res;
+};
