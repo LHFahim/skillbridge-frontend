@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -8,21 +9,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatDateTime } from "@/lib/utils";
 import { BookingStatusEnum, IBooking } from "@/types/booking.interface";
+import { useState } from "react";
 
 export function BookingTable({ bookings }: { bookings: IBooking[] }) {
-  const formatDateTime = (date: string | Date | undefined) => {
-    if (!date) return "-";
-    const d = new Date(date);
-    return d.toLocaleString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
+  const [reviewingBooking, setReviewingBooking] = useState<IBooking | null>(
+    null,
+  );
   const getStatusBadge = (status: BookingStatusEnum) => {
     const badgeClass =
       status === BookingStatusEnum.CONFIRMED
@@ -39,20 +33,25 @@ export function BookingTable({ bookings }: { bookings: IBooking[] }) {
   };
 
   return (
-    <div className="border rounded-md p-5">
-      <Table>
+    <div className="border rounded-md p-5 overflow-x-auto scrollbar-hide">
+      <Table className="min-w-full">
         <TableHeader>
           <TableRow>
+            <TableHead>Tutor Name</TableHead>
             <TableHead>Start Time</TableHead>
             <TableHead>End Time</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Categories</TableHead>
+            <TableHead>Cancel Reason</TableHead>
+            <TableHead>Cancelled By</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {bookings.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={3}
+                colSpan={8}
                 className="text-center py-8 text-muted-foreground"
               >
                 No bookings found
@@ -60,17 +59,37 @@ export function BookingTable({ bookings }: { bookings: IBooking[] }) {
             </TableRow>
           ) : (
             bookings.map((booking) => {
-              const startAt =
-                booking.availabilitySlot?.startAt ?? booking.startAt;
-              const endAt = booking.availabilitySlot?.endAt ?? booking.endAt;
+              const startAt = booking.slot?.startAt;
+              const endAt = booking.slot?.endAt;
+
+              const slot = booking.slot;
 
               return (
                 <TableRow key={booking.id}>
                   <TableCell className="font-medium">
-                    {formatDateTime(startAt)}
+                    {booking.tutorProfile?.user?.name || "N/A"}
                   </TableCell>
-                  <TableCell>{formatDateTime(endAt)}</TableCell>
+                  <TableCell className="font-medium">
+                    {formatDateTime(new Date(startAt!))}
+                  </TableCell>
+                  <TableCell>{formatDateTime(new Date(endAt!))}</TableCell>
                   <TableCell>{getStatusBadge(booking.status)}</TableCell>
+                  <TableCell>
+                    {booking.tutorProfile?.categories
+                      ?.map((cat: any) => cat.name)
+                      .join(", ") || "N/A"}
+                  </TableCell>
+                  <TableCell>{booking.cancelReason || "N/A"}</TableCell>
+                  <TableCell>{booking.cancelledBy || "N/A"}</TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setReviewingBooking(booking)}
+                    >
+                      Review
+                    </Button>
+                  </TableCell>
                 </TableRow>
               );
             })

@@ -12,6 +12,7 @@ export default async function BookingPage() {
   const availableSlots = allSlots.filter(
     (slot: { status: AvailabilityStatusEnum }) =>
       slot.status === AvailabilityStatusEnum.OPEN,
+    // slot,
   );
 
   const bookingsResponse = await bookingService.getMyBookings();
@@ -28,7 +29,8 @@ export default async function BookingPage() {
       </div>
 
       <div className="flex w-full justify-center p-6 md:p-10">
-        <div className="w-full max-w-4xl">
+        {/* w-full max-w-4xl */}
+        <div className="">
           <h2 className="text-xl font-semibold mb-4">Your Bookings</h2>
           <BookingTable bookings={bookings} />
         </div>

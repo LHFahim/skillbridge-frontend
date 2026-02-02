@@ -10,10 +10,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatDateTime } from "@/lib/utils";
 import {
   AvailabilitySlot,
   AvailabilityStatusEnum,
 } from "@/types/availability.interface";
+import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -49,17 +51,6 @@ export function AvailableSlotsTable({
     }
   };
 
-  const formatDateTime = (date: string | Date) => {
-    const d = new Date(date);
-    return d.toLocaleString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   const getStatusBadge = (status: AvailabilityStatusEnum) => {
     const badgeClass =
       status === AvailabilityStatusEnum.OPEN
@@ -78,17 +69,22 @@ export function AvailableSlotsTable({
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Tutor Name</TableHead>
             <TableHead>Start Time</TableHead>
             <TableHead>End Time</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Categories</TableHead>
+            <TableHead>Work Experience</TableHead>
+            <TableHead>Image</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
+
         <TableBody>
           {availabilitySlots.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={4}
+                colSpan={8}
                 className="text-center py-8 text-muted-foreground"
               >
                 No available slots found
@@ -99,10 +95,43 @@ export function AvailableSlotsTable({
               return (
                 <TableRow key={slot.id}>
                   <TableCell className="font-medium">
+                    {slot.tutorProfile?.user?.name || "Unnamed"}
+                  </TableCell>
+
+                  <TableCell className="font-medium">
                     {formatDateTime(slot.startAt)}
                   </TableCell>
+
                   <TableCell>{formatDateTime(slot.endAt)}</TableCell>
+
                   <TableCell>{getStatusBadge(slot.status)}</TableCell>
+
+                  <TableCell>
+                    {slot.tutorProfile?.categories
+                      ?.map((category: any) => category.name)
+                      .join(", ") || "N/A"}
+                  </TableCell>
+
+                  <TableCell>
+                    {`${slot.tutorProfile?.yearsExperience} Years` || "N/A"}
+                  </TableCell>
+
+                  <TableCell>
+                    {slot.tutorProfile?.user?.image ? (
+                      <Image
+                        src={slot.tutorProfile.user.image}
+                        alt="Tutor"
+                        width={40}
+                        height={40}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-sm">
+                        {slot.tutorProfile?.user?.name?.charAt(0) || "?"}
+                      </div>
+                    )}
+                  </TableCell>
+
                   <TableCell className="text-right">
                     <Button
                       size="sm"

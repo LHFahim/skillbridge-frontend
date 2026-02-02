@@ -37,7 +37,7 @@ export const bookingService = {
     try {
       const cookieStore = await cookies();
 
-      const res = await fetch(`${API_URL}/bookings`, {
+      const res = await fetch(`${API_URL}/bookings/my-bookings`, {
         method: "GET",
         headers: {
           Cookie: cookieStore.toString(),

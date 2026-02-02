@@ -8,13 +8,20 @@ export enum BookingStatusEnum {
 
 export interface IBooking {
   id: string;
-  availabilityId: string;
+
+  cancelReason?: string;
+  cancelledBy?: string;
+
+  availabilityId?: string;
+  slotId?: string;
   studentId: string;
   status: BookingStatusEnum;
 
-  availabilitySlot?: AvailabilitySlot;
+  slot?: AvailabilitySlot;
   startAt?: string | Date;
   endAt?: string | Date;
+
+  tutorProfile?: any;
 
   createdAt: Date;
   updatedAt: Date;
