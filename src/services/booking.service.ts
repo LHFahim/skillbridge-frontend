@@ -78,7 +78,6 @@ export const bookingService = {
       );
 
       const data = await res.json();
-      console.log("🚀 ~ data:", data);
 
       if (data.error) {
         return {

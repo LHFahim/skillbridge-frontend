@@ -5,11 +5,38 @@ import { cookies } from "next/headers";
 const API_URL = env.API_URL;
 
 export const reviewService = {
-  createReview: async (payload: ICreateReview) => {
+  getReviewsByTutorId: async (tutorProfileId: string) => {
     try {
       const cookieStore = await cookies();
 
-      console.log({ payload });
+      const res = await fetch(
+        `${API_URL}/reviews?tutorProfileId=${tutorProfileId}`,
+        {
+          method: "GET",
+          headers: {
+            Cookie: cookieStore.toString(),
+          },
+          cache: "no-store",
+        },
+      );
+
+      const data = await res.json();
+
+      if (data.error) {
+        return {
+          data: null,
+          error: { message: "Error: Could not fetch reviews." },
+        };
+      }
+
+      return { data: data, error: null };
+    } catch (err) {
+      return { data: null, error: { message: "Something Went Wrong" } };
+    }
+  },
+  createReview: async (payload: ICreateReview) => {
+    try {
+      const cookieStore = await cookies();
 
       const res = await fetch(`${API_URL}/reviews`, {
         method: "POST",
@@ -21,7 +48,6 @@ export const reviewService = {
       });
 
       const data = await res.json();
-      console.log("🚀 ~ data:", data);
 
       if (data.error) {
         return {
