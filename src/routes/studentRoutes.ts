@@ -16,6 +16,10 @@ export const studentRoutes: IRoute[] = [
         title: "Booking",
         url: "/student-dashboard/booking",
       },
+      {
+        title: "Edit Profile",
+        url: "/student-dashboard/edit-profile",
+      },
       // {
       //   title: "Student History",
       //   url: "/dashboard/student-history",
