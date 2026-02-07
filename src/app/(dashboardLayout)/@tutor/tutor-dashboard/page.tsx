@@ -1,4 +1,4 @@
-import { BookingTable } from "@/components/modules/booking/booking-table";
+import { TutorBookingTable } from "@/components/modules/booking/tutor-booking-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { bookingService } from "@/services/booking.service";
 import { BookingStatusEnum, type IBooking } from "@/types/booking.interface";
@@ -118,7 +118,7 @@ export default async function TutorDashboardPage() {
 
       <div className="space-y-3 mt-10">
         <h2 className="text-lg font-semibold">Your Bookings</h2>
-        <BookingTable bookings={bookings} />
+        <TutorBookingTable bookings={bookings} />
       </div>
     </div>
   );
