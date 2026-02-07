@@ -3,6 +3,7 @@ import * as React from "react";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -12,6 +13,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { RolesEnum } from "@/constants/role";
+import { LogoutButton } from "@/components/modules/authentication/logout-button";
 import { adminRoutes } from "@/routes/adminRoutes";
 import { studentRoutes } from "@/routes/studentRoutes";
 import { tutorRoutes } from "@/routes/tutorRoutes";
@@ -62,6 +64,13 @@ export function AppSidebar({
           </SidebarGroup>
         ))}
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <LogoutButton />
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );
