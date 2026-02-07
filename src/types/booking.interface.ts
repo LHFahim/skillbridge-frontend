@@ -22,6 +22,11 @@ export interface IBooking {
   endAt?: string | Date;
 
   tutorProfile?: any;
+  student?: {
+    id?: string;
+    name?: string;
+    email?: string;
+  };
 
   createdAt: Date;
   updatedAt: Date;

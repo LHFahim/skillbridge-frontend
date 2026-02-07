@@ -1,4 +1,4 @@
-import { BookingTable } from "@/components/modules/booking/booking-table";
+import { AdminBookingTable } from "@/components/modules/booking/admin-booking-table";
 import { bookingService } from "@/services/booking.service";
 import { type IBooking } from "@/types/booking.interface";
 
@@ -22,7 +22,7 @@ export default async function AdminBookingsPage() {
         </div>
       )}
 
-      <BookingTable bookings={bookings} />
+      <AdminBookingTable bookings={bookings} />
     </div>
   );
 }
