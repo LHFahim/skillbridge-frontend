@@ -89,6 +89,34 @@ export const bookingService = {
     }
   },
 
+  getAllBookings: async () => {
+    try {
+      const cookieStore = await cookies();
+
+      const res = await fetch(`${API_URL}/bookings/admin-bookings`, {
+        method: "GET",
+        headers: {
+          Cookie: cookieStore.toString(),
+        },
+        cache: "no-store",
+        next: { tags: ["bookings"] },
+      });
+
+      const data = await res.json();
+
+      if (data.error) {
+        return {
+          data: null,
+          error: { message: "Error: Could not fetch bookings." },
+        };
+      }
+
+      return { data: data, error: null };
+    } catch (err) {
+      return { data: null, error: { message: "Something Went Wrong" } };
+    }
+  },
+
   cancelBooking: async (bookingId: string, reason?: string) => {
     try {
       const cookieStore = await cookies();

@@ -12,6 +12,10 @@ export const adminRoutes: IRoute[] = [
         title: "Analytics",
         url: "/admin-dashboard/analytics",
       },
+      {
+        title: "All Bookings",
+        url: "/admin-dashboard/bookings",
+      },
       { title: "Categories", url: "/admin-dashboard/categories" },
       { title: "Users", url: "/admin-dashboard/users" },
     ],
