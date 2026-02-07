@@ -6,11 +6,49 @@ const AUTH_URL = env.AUTH_URL;
 const API_URL = env.API_URL;
 
 export const tutorService = {
-  getAllTutors: async () => {
+  getAllTutors: async (filters?: {
+    search?: string;
+    categoryIds?: string[];
+    minRate?: number;
+    maxRate?: number;
+    currency?: string;
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: string;
+  }) => {
     try {
       // const cookieStore = await cookies();
 
-      const res = await fetch(`${API_URL}/tutors`, {
+      const params = new URLSearchParams();
+
+      if (filters?.search) params.append("search", filters.search);
+
+      if (filters?.categoryIds && filters.categoryIds.length > 0) {
+        filters.categoryIds.forEach((id) => params.append("categoryIds", id));
+      }
+
+      if (filters?.minRate !== undefined)
+        params.append("minRate", filters.minRate.toString());
+      if (filters?.maxRate !== undefined)
+        params.append("maxRate", filters.maxRate.toString());
+
+      if (filters?.currency) params.append("currency", filters.currency);
+
+      if (filters?.page !== undefined)
+        params.append("page", filters.page.toString());
+      if (filters?.limit !== undefined)
+        params.append("limit", filters.limit.toString());
+
+      if (filters?.sortBy) params.append("sortBy", filters.sortBy);
+      if (filters?.sortOrder) params.append("sortOrder", filters.sortOrder);
+
+      const queryString = params.toString();
+      const url = queryString
+        ? `${API_URL}/tutors?${queryString}`
+        : `${API_URL}/tutors`;
+
+      const res = await fetch(url, {
         method: "GET",
         // headers: {
         //   Cookie: cookieStore.toString(),
@@ -60,6 +98,7 @@ export const tutorService = {
       return { data: null, error: { message: "Something Went Wrong" } };
     }
   },
+
   createTutorProfile: async (tutorData: ICreateTutor) => {
     try {
       const cookieStore = await cookies();
