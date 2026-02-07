@@ -1,6 +1,6 @@
 "use client";
 
-import { createTutorProfile } from "@/actions/tutor.action";
+import { createTutorProfile, updateTutorProfile } from "@/actions/tutor.action";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -28,38 +28,66 @@ const formSchema = z.object({
   categories: z.array(z.string()).min(1, "Select at least one category"),
 });
 
+type TutorFormMode = "create" | "update";
+
+interface TutorFormValues {
+  hourlyRate: number;
+  yearsExperience: number;
+  categories: string[];
+}
+
 export function TutorForm({
   categories,
+  mode = "create",
+  initialValues,
   ...props
-}: React.ComponentProps<typeof Card> & { categories: ICategory[] }) {
+}: React.ComponentProps<typeof Card> & {
+  categories: ICategory[];
+  mode?: TutorFormMode;
+  initialValues?: Partial<TutorFormValues>;
+}) {
   const form = useForm({
     defaultValues: {
-      hourlyRate: 100,
-      yearsExperience: 2,
-      categories: [] as string[],
+      hourlyRate: initialValues?.hourlyRate ?? 100,
+      yearsExperience: initialValues?.yearsExperience ?? 2,
+      categories: initialValues?.categories ?? ([] as string[]),
     },
     validators: {
       onSubmit: formSchema,
     },
     onSubmit: async ({ value }) => {
-      const toastId = toast.loading("Creating tutor profile");
-
-      const tutorData = {
-        hourlyRate: value.hourlyRate,
-        yearsExperience: value.yearsExperience,
-        categories: value.categories,
-      };
+      const toastId = toast.loading(
+        mode === "create" ? "Creating tutor profile" : "Updating tutor profile",
+      );
 
       try {
-        const res = await createTutorProfile(tutorData);
+        const res =
+          mode === "create"
+            ? await createTutorProfile({
+                hourlyRate: value.hourlyRate,
+                yearsExperience: value.yearsExperience,
+                categories: value.categories,
+              })
+            : await updateTutorProfile({
+                hourlyRate: value.hourlyRate,
+                yearsExperience: value.yearsExperience,
+                categoryIds: value.categories,
+              });
 
         if (res.error) {
           toast.error(res.error.message, { id: toastId });
           return;
         }
 
-        toast.success("Tutor profile created successfully", { id: toastId });
-        form.reset();
+        toast.success(
+          mode === "create"
+            ? "Tutor profile created successfully"
+            : "Tutor profile updated successfully",
+          { id: toastId },
+        );
+        if (mode === "create") {
+          form.reset();
+        }
       } catch (err) {
         toast.error("Something Went Wrong", { id: toastId });
       }
@@ -69,9 +97,13 @@ export function TutorForm({
   return (
     <Card {...props}>
       <CardHeader>
-        <CardTitle>Create Tutor Profile</CardTitle>
+        <CardTitle>
+          {mode === "create" ? "Create Tutor Profile" : "Update Tutor Profile"}
+        </CardTitle>
         <CardDescription>
-          Enter your tutor information to create your profile.
+          {mode === "create"
+            ? "Enter your tutor information to create your profile."
+            : "Update your tutor profile information."}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -95,10 +127,15 @@ export function TutorForm({
                       type="number"
                       id={field.name}
                       name={field.name}
-                      value={field.state.value}
-                      onChange={(e) =>
-                        field.handleChange(Number(e.target.value))
-                      }
+                      value={field.state.value ?? ""}
+                      onChange={(e) => {
+                        const nextValue = e.target.value;
+                        field.handleChange(
+                          nextValue === ""
+                            ? (undefined as unknown as number)
+                            : Number(nextValue),
+                        );
+                      }}
                     />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
@@ -121,10 +158,15 @@ export function TutorForm({
                       type="number"
                       id={field.name}
                       name={field.name}
-                      value={field.state.value}
-                      onChange={(e) =>
-                        field.handleChange(Number(e.target.value))
-                      }
+                      value={field.state.value ?? ""}
+                      onChange={(e) => {
+                        const nextValue = e.target.value;
+                        field.handleChange(
+                          nextValue === ""
+                            ? (undefined as unknown as number)
+                            : Number(nextValue),
+                        );
+                      }}
                     />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
@@ -188,7 +230,7 @@ export function TutorForm({
       </CardContent>
       <CardFooter className="flex flex-col gap-5 justify-end">
         <Button form="tutor-form" type="submit" className="w-full">
-          Create Profile
+          {mode === "create" ? "Create Profile" : "Update Profile"}
         </Button>
       </CardFooter>
     </Card>
