@@ -17,10 +17,10 @@ export const tutorRoutes: IRoute[] = [
         url: "/tutor-dashboard/update",
       },
       { title: "Availability", url: "/tutor-dashboard/availability" },
-      {
-        title: "Tutor History",
-        url: "/tutor-dashboard/tutor-history",
-      },
+      // {
+      //   title: "Tutor History",
+      //   url: "/tutor-dashboard/tutor-history",
+      // },
     ],
   },
 ];
